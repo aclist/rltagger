@@ -1,3 +1,4 @@
+
 // ==UserScript==
 // @name     RLTagger
 // @description untag games
@@ -22,24 +23,35 @@ var startButton = document.createElement('div');
 startButton.style = "top:0;right:0;position:fixed;z-index: 9999; background-color:black; border: 0px; padding-right: 5px; font-size: 1em";
 document.body.appendChild(startButton);
 
+//report button//
+var reportButton = document.createElement('button');
+reportButton.innerHTML = 'Add to blacklist';
+reportButton.style = "top:0;right:0;position:fixed;z-index: 9999; background-color:black; color: white; border: 0px; padding-right: 5px; margin-top: 20px; font-size: 1em";
+var issues = "https://github.com/aclist/rltagger/issues/new?body=Rationale:&title=[Blacklist] "
+var appid = window.location.pathname.split('/')[2];
 
-    var appid = window.location.pathname.split('/')[2];
+    reportButton.onclick = () => {
+    console.log(appid);
+    window.open(issues + appid);
+}
+
  // validate blacklist
 if (arr.indexOf(appid) > -1) {
     console.log("[RLtagger] Found appid in blacklist");
 //check for tag
     var xpathResult = document.evaluate("(//text()[contains(., 'Traditional Roguelike')])[1]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
 var node=xpathResult.singleNodeValue;
-if (node==null) {
-// tag not present
-startButton.innerHTML = '[RLTagger] Blacklisted, but tag removed';
-    console.log("[RLtagger] Tag was removed, skipping");
-} else {
 // open tag modal
-document.getElementsByClassName('add_button')[0].click();}
+document.getElementsByClassName('add_button')[0].click();
 // check if ticked
     var parent = document.querySelector (".app_tag_control.popular[data-tagid='454187']"),
        child = document.querySelector(".reported");
+if (parent==null) {
+// tag not present
+startButton.innerHTML = '[RLTagger] Blacklisted + removed';
+    document.querySelector(".newmodal_close").click();
+    console.log("[RLtagger] Tag was removed, skipping");
+} else {
 if (parent.contains(child)) {
 //close window
 startButton.innerHTML = '[RLTagger] Already reported';
@@ -54,15 +66,18 @@ document.querySelector(".newmodal_close").click();
         setTimeout( function() {
 document.querySelector(".newmodal_close").click();
 }, 1000 );
-startButton.innerHTML = '[RLTagger] Submitted new report';
+startButton.innerHTML = '[RLTagger] Submitted report';
  console.log("[RLTagger] Submitted new report");
 }
-} else {
+}}
+    else {
 startButton.innerHTML = '[RLTagger] Not in blacklist';
+document.body.appendChild(reportButton);
 console.log("[RLtagger] Not in blacklist, skipping")
    return;
 }
 };
+
 
 var site = "https://raw.githubusercontent.com/aclist/rltagger/main/blacklist"
 
