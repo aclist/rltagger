@@ -10,9 +10,6 @@
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
-//var responseXML = new DOMParser().parseFromString(response.responseText, "text/xml");
-//var content = doc.querySelector("pre").innerHTML;
-
 function makeArr(response){
 var parser = new DOMParser ();
 var doc = parser.parseFromString (response.responseText, "text/html");
@@ -77,7 +74,6 @@ console.log("[RLtagger] Not in blacklist, skipping")
    return;
 }
 };
-
 
 var site = "https://raw.githubusercontent.com/aclist/rltagger/main/blacklist"
 
