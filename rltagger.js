@@ -2,7 +2,7 @@
 // @name             RLTagger
 // @description untag games
 // @author           yendor
-// @version          2.0.0
+// @version          2.0.1
 // @match            https://store.steampowered.com/*
 // @connect         githubusercontent.com
 // @require           http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
@@ -95,52 +95,57 @@ function makeArr(response) {
         window.open(issues + appid);
     }
 
-
+    function checktag() {
+        const tagtext = Array.from(document.querySelectorAll(".app_tag")).map(x => x.innerText).join('\n');
+        if (tagtext.includes("Traditional Roguelike")) {
+            console.log("[RLTagger] Found Traditional Roguelike tag");
+            return true
+        }
+    };
 
 
     function process() {
         // validate blacklist
         if (window.location.href.indexOf("app") > -1) {
+            if (checktag()) {
+                if (arr.indexOf(appid) > -1) {
 
-            if (arr.indexOf(appid) > -1) {
-                console.log("[RLtagger] Found appid in blacklist");
-                //check for tag
-                var xpathResult = document.evaluate("(//text()[contains(., 'Traditional Roguelike')])[1]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-                var node = xpathResult.singleNodeValue;
-                // open tag modal
-                document.getElementsByClassName('add_button')[0].click();
-                // check if ticked
-                var parent = document.querySelector(".app_tag_control.popular[data-tagid='454187']"),
-                    child = document.querySelector(".reported");
-                if (parent == null) {
-                    // tag not present
-                    startButton.innerHTML = '[RLTagger] Blacklisted + removed';
-                    document.querySelector(".newmodal_close").click();
-                    console.log("[RLtagger] Tag was removed, skipping");
-                } else {
-                    if (parent.contains(child)) {
-                        //close window
-                        startButton.innerHTML = '[RLTagger] Already reported';
-                        console.log("[RLtagger] Already reported, skipping");
+                    console.log("[RLtagger] Found appid in blacklist");
+                    // open tag modal
+                    document.getElementsByClassName('add_button')[0].click();
+                    // check if ticked
+                    var parent = document.querySelector(".app_tag_control.popular[data-tagid='454187']"),
+                        child = document.querySelector(".reported");
+                    if (parent == null) {
+                        // tag not present
+                        startButton.innerHTML = '[RLTagger] Blacklisted + removed';
                         document.querySelector(".newmodal_close").click();
+                        console.log("[RLtagger] Tag was removed, skipping");
                     } else {
-                        // click flag
-                        document.querySelector(".app_tag_control.popular[data-tagid='454187'] > .app_tag_report").click();
-                        setTimeout(function() {
+                        if (parent.contains(child)) {
+                            //close window
+                            startButton.innerHTML = '[RLTagger] Already reported';
+                            console.log("[RLtagger] Already reported, skipping");
                             document.querySelector(".newmodal_close").click();
-                        }, 1000);
-                        setTimeout(function() {
-                            document.querySelector(".newmodal_close").click();
-                        }, 1000);
-                        startButton.innerHTML = '[RLTagger] Submitted report';
-                        console.log("[RLTagger] Submitted new report");
+                        } else {
+                            // click flag
+                            document.querySelector(".app_tag_control.popular[data-tagid='454187'] > .app_tag_report").click();
+                            setTimeout(function() {
+                                document.querySelector(".newmodal_close").click();
+                            }, 1000);
+                            setTimeout(function() {
+                                document.querySelector(".newmodal_close").click();
+                            }, 1000);
+                            startButton.innerHTML = '[RLTagger] Submitted report';
+                            console.log("[RLTagger] Submitted new report");
+                        }
                     }
+                } else {
+                    startButton.innerHTML = '[RLTagger] Not in blacklist';
+                    document.body.appendChild(reportButton);
+                    console.log("[RLtagger] Not in blacklist, skipping")
+                    return;
                 }
-            } else {
-                startButton.innerHTML = '[RLTagger] Not in blacklist';
-                document.body.appendChild(reportButton);
-                console.log("[RLtagger] Not in blacklist, skipping")
-                return;
             }
         }
     }
