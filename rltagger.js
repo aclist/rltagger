@@ -1,17 +1,14 @@
-
 // ==UserScript==
-// @name     RLTagger
+// @name             RLTagger
 // @description untag games
-// @author yendor
-// @version 2.1.0
-// @match        https://store.steampowered.com/*
-// @match https://store.steampowered.com/tags/en/Traditional Roguelike/
-// @connect githubusercontent.com
-// @require  http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
-// @grant       GM_xmlhttpRequest
-// @grant         GM.getValue
-// @grant         GM.setValue
-
+// @author           yendor
+// @version          2.0.0
+// @match            https://store.steampowered.com/*
+// @connect         githubusercontent.com
+// @require           http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
+// @grant               GM_xmlhttpRequest
+// @grant               GM.getValue
+// @grant               GM.setValue
 // ==/UserScript==
 
 var arr = [];
