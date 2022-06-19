@@ -1,9 +1,8 @@
-
 // ==UserScript==
 // @name             RLTagger
 // @description untag games
 // @author           yendor
-// @version          2.1.0
+// @version          2.1.1
 // @match            https://store.steampowered.com/*
 // @connect         githubusercontent.com
 // @require           http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
@@ -197,28 +196,28 @@ function compare(response) {
     var doc = parser.parseFromString(response.responseText, "text/html");
     var content = response.responseText
     var lines = content.split("\n")
+
     for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
-
         if (line.indexOf("@version") != -1) {
-
             var reg = line.match(/\d.+/)
             if (localVersion !== reg[0]) {
                 var newVerAlert = "New version available!"
+
             } else {
-                newVerAlert = ""
-            }
-            var alButton = document.createElement('div');
-            alButton.innerHTML = newVerAlert
-            alButton.setAttribute("id", "albutton")
-            alButton.style = "color:yellow;text-decoration:underline;cursor:pointer"
-            carousel.appendChild(alButton);
-            alButton.onclick = () => {
-                window.open(upstream);
+                return
             }
         }
-
     }
+    var alButton = document.createElement('div');
+    alButton.innerHTML = newVerAlert
+    alButton.setAttribute("id", "alButton")
+    alButton.style = "color:yellow;text-decoration:underline;cursor:pointer"
+    carousel.appendChild(alButton);
+    alButton.onclick = () => {
+        window.open(upstream);
+    }
+
 }
 
 function checkVersion() {
@@ -234,7 +233,6 @@ function checkVersion() {
     });
 };
 
-
 //localVersion
 var login = document.querySelector("#account_pulldown")
 if (login == null) {
@@ -243,5 +241,4 @@ if (login == null) {
 } else {
     checkVersion();
     fetch();
-
 }
