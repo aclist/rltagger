@@ -10,14 +10,28 @@
 // @grant               GM.getValue
 // @grant               GM.setValue
 // ==/UserScript==
-
 var arr = [];
 var aid = "https://store.steampowered.com/app/";
 var site = "https://raw.githubusercontent.com/aclist/rltagger/main/blacklist"
 var upstream = "https://raw.githubusercontent.com/aclist/rltagger/main/rltagger.js"
-var carousel = document.querySelector('.glance_tags_ctn.popular_tags_ctn')
+var issues = "https://github.com/aclist/rltagger/issues/new?body=Rationale: &title=[Blacklist] "
+var appid = window.location.pathname.split('/')[2];
 var localVersion = GM_info.script.version;
+
 var buttonStyle = "z-index: 9999; color: white;margin-top: 5px;background-color:#222; border: 0px; font-size: 1em;margin-right:5px !important;margin-bottom: 0;text-align: center;white-space: nowrap;vertical-align: middle;-ms-touch-action: manipulation;touch-action: manipulation;cursor: pointer;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;border-radius: 4px;text-decoration: none;"
+var carousel = document.querySelector('.glance_tags_ctn.popular_tags_ctn')
+var oneShotButton = document.createElement('div');
+oneShotButton.setAttribute("id", "oneShotButton")
+oneShotButton.style = buttonStyle + "background-color:#444 !important";
+
+var startButton = document.createElement('div');
+startButton.setAttribute("id", "rlStartButton");
+startButton.style = "z-index: 9999; color: white;background-color:black; border: 0px; font-size: 1em;text-align:center;margin-right:5px";
+
+var reportButton = document.createElement('div');
+reportButton.setAttribute("id", "rlReportButton");
+reportButton.innerHTML = 'Submit report (GitHub)';
+reportButton.style = buttonStyle;
 
 
 function makeArr(response) {
@@ -65,15 +79,13 @@ function makeArr(response) {
             await GM.setValue("state", 0);
             console.log("[RLTagger] One-shot mode ended");
             console.log("[RLTagger] Index: " + pg + "/" + len - 1 + ", ID:" + arr[pg]);
+            process();
+            oneShotButton.innerHTML = 'One-shot mode (ETA ' + time + ' minutes)';
+            carousel.appendChild(oneShotButton);
         } else {
             console.log("[RLTagger] Normal mode");
             process();
-            var oneShotButton = document.createElement('div');
-            oneShotButton.setAttribute("id", "oneShotButton")
             oneShotButton.innerHTML = 'One-shot mode (ETA ' + time + ' minutes)';
-            oneShotButton.style = buttonStyle + "background-color:#444 !important";
-
-
             carousel.appendChild(oneShotButton);
 
             oneShotButton.onclick = () => {
@@ -95,19 +107,7 @@ function makeArr(response) {
     var content = response.responseText
     arr = content.toString().replace(/\r\n/g, '\n').split('\n').filter(x => x !== '');
 
-    var startButton = document.createElement('div');
-    startButton.setAttribute("id", "rlStartButton");
-    startButton.style = "z-index: 9999; color: white;background-color:black; border: 0px; font-size: 1em;text-align:center;margin-right:5px";
     carousel.appendChild(startButton);
-
-    var buttonStyle = "z-index: 9999; color: white;margin-top: 5px;background-color:#222; border: 0px; font-size: 1em;margin-right:5px !important;margin-bottom: 0;text-align: center;white-space: nowrap;vertical-align: middle;-ms-touch-action: manipulation;touch-action: manipulation;cursor: pointer;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;border-radius: 4px;text-decoration: none;"
-
-    var reportButton = document.createElement('div');
-    reportButton.setAttribute("id", "rlReportButton");
-    reportButton.innerHTML = 'Submit report (GitHub)';
-    reportButton.style = buttonStyle;
-    var issues = "https://github.com/aclist/rltagger/issues/new?body=Rationale:&title=[Blacklist] "
-    var appid = window.location.pathname.split('/')[2];
 
     reportButton.onclick = () => {
         console.log(appid);
@@ -122,8 +122,8 @@ function makeArr(response) {
         }
     };
 
-    function alreadyReported() {
-        startButton.innerHTML = '[RLTagger] Already reported';
+    function alreadyFlagged() {
+        startButton.innerHTML = '[RLTagger] Already flagged';
         console.log("[RLTagger] Already reported, skipping");
         document.querySelector(".newmodal_close").click();
     };
@@ -143,8 +143,8 @@ function makeArr(response) {
         setTimeout(function() {
             document.querySelector(".newmodal_close").click();
         }, 1000);
-        startButton.innerHTML = '[RLTagger] Submitted report';
-        console.log("[RLTagger] Submitted new report");
+        startButton.innerHTML = '[RLTagger] Submitted flag';
+        console.log("[RLTagger] Submitted new flag");
     }
 
     function validateTag() {
@@ -156,7 +156,7 @@ function makeArr(response) {
             tagPresentButRemoved();
         } else {
             if (parent.contains(child)) {
-                alreadyReported();
+                alreadyFlagged();
             } else {
                 tickReportFlag();
             }
