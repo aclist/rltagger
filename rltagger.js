@@ -2,7 +2,7 @@
 // @name             RLTagger
 // @description untag games
 // @author           yendor
-// @version          2.1.1
+// @version          2.1.2
 // @match            https://store.steampowered.com/*
 // @connect         githubusercontent.com
 // @require           http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
@@ -10,6 +10,7 @@
 // @grant               GM.getValue
 // @grant               GM.setValue
 // ==/UserScript==
+
 var arr = [];
 var aid = "https://store.steampowered.com/app/";
 var site = "https://raw.githubusercontent.com/aclist/rltagger/main/blacklist"
@@ -30,27 +31,32 @@ function makeArr(response) {
 
         function nextPg() {
             window.location.href = aid + arr[pg_next];
-
         }
         if (state == 1 && pg < len - 1) {
-            console.log("[RLTagger] One-shot mode");
-            console.log("[RLTagger] Index: " + pg + "/" + (len - 1) + ", ID:" + arr[pg]);
-            await GM.setValue("id", pg_next);
-            var stopButton = document.createElement('div');
-            stopButton.setAttribute("id", "stopButton")
-            stopButton.innerHTML = "Stop one-shot mode (" + pg + "/" + (len - 1) + ")";
-            stopButton.style = buttonStyle;
-            //var previous = document.querySelector("#rlStartButton");
-            carousel.appendChild(stopButton);
-            stopButton.onclick = () => {
-                console.log("[RLTagger] Stopping one-shot mode");
-                (async () => {
-                    GM.setValue("state", 0);
-                })();
-                window.location.reload
+            if (window.location.href.indexOf("app") == -1) {
+                setTimeout(nextPg, 3000);
+            } else {
+                console.log("[RLTagger] One-shot mode");
+                console.log("[RLTagger] Index: " + pg + "/" + (len - 1) + ", ID:" + arr[pg]);
+                await GM.setValue("id", pg_next);
+
+                var stopButton = document.createElement('div');
+                stopButton.setAttribute("id", "stopButton")
+                stopButton.innerHTML = "Stop one-shot mode (" + pg + "/" + (len - 1) + ")";
+                stopButton.style = buttonStyle;
+                carousel.appendChild(stopButton);
+
+                stopButton.onclick = () => {
+                    console.log("[RLTagger] Stopping one-shot mode");
+                    (async () => {
+                        GM.setValue("state", 0);
+                    })();
+                    window.location.reload
+                }
+
+                process();
+                setTimeout(nextPg, 3000);
             }
-            process();
-            setTimeout(nextPg, 3000);
 
         } else if (state == 1) {
             //last page
@@ -118,7 +124,7 @@ function makeArr(response) {
 
     function alreadyReported() {
         startButton.innerHTML = '[RLTagger] Already reported';
-        console.log("[RLtagger] Already reported, skipping");
+        console.log("[RLTagger] Already reported, skipping");
         document.querySelector(".newmodal_close").click();
     };
 
@@ -126,7 +132,7 @@ function makeArr(response) {
 
         startButton.innerHTML = '[RLTagger] Blacklisted + removed';
         document.querySelector(".newmodal_close").click();
-        console.log("[RLtagger] Tag was removed, skipping");
+        console.log("[RLTagger] Tag was removed, skipping");
     }
 
     function tickReportFlag() {
@@ -142,7 +148,7 @@ function makeArr(response) {
     }
 
     function validateTag() {
-        console.log("[RLtagger] Found appid in blacklist");
+        console.log("[RLTagger] Found appid in blacklist");
         document.getElementsByClassName('add_button')[0].click();
         var parent = document.querySelector(".app_tag_control.popular[data-tagid='454187']"),
             child = document.querySelector(".reported");
