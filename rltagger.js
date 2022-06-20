@@ -13,7 +13,7 @@
 var arr = [];
 var aid = "https://store.steampowered.com/app/";
 var site = "https://raw.githubusercontent.com/aclist/rltagger/main/blacklist"
-var upstream = "https://raw.githubusercontent.com/aclist/rltagger/main/rltagger.js"
+var upstream = "https://raw.githubusercontent.com/aclist/rltagger/main/rltagger.user.js"
 var issues = "https://github.com/aclist/rltagger/issues/new?body=Rationale: &title=[Blacklist] "
 var appid = window.location.pathname.split('/')[2];
 var localVersion = GM_info.script.version;
